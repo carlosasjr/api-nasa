@@ -1,6 +1,25 @@
 <template>
   <q-page padding>
+
     <div class="row">
+      <q-select
+        outlined
+        v-model="rover"
+        :options="optionsRovers"
+        label="Rover"
+        map-options
+        option-label="name"
+        class="col-12"
+        @input="getManifest"
+      >
+        <template v-slot:prepend>
+          <q-icon name="brightness_high" />
+        </template>
+      </q-select>
+    </div>
+
+
+    <div class="row q-mt-sm">
       <q-select
         outlined
         v-model="model"
@@ -16,6 +35,10 @@
         </template>
       </q-select>
     </div>
+
+
+
+
     <div class="row q-mt-sm">
       <q-table
         grid
@@ -79,11 +102,13 @@ export default {
   data() {
     return {
       model: '',
+      rover: '',
       manifest: '',
       photoList: [],
       optionsSol: [],
       solSelected: null,
       loading: false,
+      optionsRovers: [],
       columns: [
         {
           name: 'id',
@@ -101,7 +126,7 @@ export default {
   },
 
   mounted() {
-    this.getManifest()
+    this.getRovers()
   },
 
   computed: {
@@ -118,9 +143,21 @@ export default {
       this.getPhotos()
     },
 
-    async getManifest() {
+    async getRovers() {
       try {
-        const {data} = await this.$axios.get('manifests/curiosity')
+        const { data } = await this.$axios.get('rovers')
+        this.optionsRovers = data.rovers
+
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async getManifest() {
+      this.reset()
+
+      try {
+        const {data} = await this.$axios.get(`manifests/${this.rover.name}`)
         this.manifest = data.photo_manifest
         this.optionsSol = data.photo_manifest.photos.reverse()
 
@@ -130,17 +167,20 @@ export default {
     },
 
     async getPhotos() {
-      this.photoList = []
       try {
         this.loading = true
-        const {data} = await this.$axios(`rovers/curiosity/photos?sol=${this.solSelected}&page=${this.pagination.page}`)
+        const {data} = await this.$axios(`rovers/${this.rover.name}/photos?sol=${this.solSelected}&page=${this.pagination.page}`)
         this.photoList = data.photos
         this.loading = false
 
       } catch (error) {
         console.log(error)
       }
+    },
 
+    reset() {
+      this.model = ''
+      this.photoList = []
     }
   }
 

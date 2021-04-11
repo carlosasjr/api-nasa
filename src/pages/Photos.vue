@@ -13,11 +13,10 @@
         @input="getManifest"
       >
         <template v-slot:prepend>
-          <q-icon name="brightness_high" />
+          <q-icon name="electric_rickshaw" />
         </template>
       </q-select>
     </div>
-
 
     <div class="row q-mt-sm">
       <q-select
@@ -35,9 +34,6 @@
         </template>
       </q-select>
     </div>
-
-
-
 
     <div class="row q-mt-sm">
       <q-table
